@@ -44,6 +44,11 @@ ip *newnode(ip *head, unsigned int adr, unsigned int len)
 	{
 		return node;
 	}
+	if(head -> length <= len)
+	{
+		node -> next = head;
+		return node;
+	}//
 	while(temp -> next != NULL)
 	{
 		if((temp -> next) -> length < len)
@@ -57,6 +62,7 @@ ip *newnode(ip *head, unsigned int adr, unsigned int len)
 			temp = temp -> next;
 		}
 	}
+	temp -> next = node;//
 	return head;
 }
 
@@ -72,10 +78,59 @@ unsigned int bin_to_int(unsigned int adr[], unsigned int length, unsigned int in
 	}
 }
 
+unsigned int bin_to_int1(unsigned int adr[])
+{
+		return bin(adr) >> (32-8);
+}
+unsigned int bin_to_int23(unsigned int adr[])
+{
+		return bin(adr) >> (32-12);
+}
+
+ip *searching(ip *head, unsigned int goal)
+{
+	unsigned int origin_adr; 
+	unsigned int target;
+	ip *temp = head;
+	while(temp != NULL)
+	{
+		origin_adr = (temp -> address) >> (32 - (temp -> length));
+		target = goal >> (32 - (temp -> length));
+		if(origin_adr == target)
+		{
+			return temp;
+			break;
+		}
+		else
+		{
+			temp = temp -> next;
+		}
+	}
+	return NULL;
+}
+
+void memory_to_ip(ip *memory, unsigned int adr[])
+{
+	if(memory != NULL)
+	{
+		unsigned int binary = memory -> address;
+		adr[0] = binary >> 24;
+		binary &= 0x00FFFFFF;
+		adr[1] = binary >> 16;
+		binary &= 0x0000FFFF;
+		adr[2] = binary >> 8;
+		binary &= 0x000000FF;
+		adr[3] = binary;
+		//length = memory -> length
+	}
+	return;
+}
+
 int main()
 {
 	int i;
-	char temp[20];
+	int locate_tab = 0;
+	char string[20];
 	unsigned int adr[4], length;
 	unsigned int int_adr = 0;
 	ip *tab1[(int)pow(2,8)];
@@ -98,9 +153,9 @@ int main()
 		tab3[i] = NULL;
 	}
 	//put all element in tab arrays to prevent *head from segmentation fault
-	while(fgets(temp, 20, k400) != NULL)
+	while(fgets(string, 20, k400) != NULL)
 	{
-		sscanf(temp, "%u.%u.%u.%u/%u", &adr[0], &adr[1], &adr[2], &adr[3], &length);
+		sscanf(string, "%u.%u.%u.%u/%u", &adr[0], &adr[1], &adr[2], &adr[3], &length);
 		if(length >= 8 && length <= 15)
 		{
 			int_adr = bin_to_int(adr, length, int_adr);
@@ -117,11 +172,62 @@ int main()
 			tab3[int_adr] = newnode(tab3[int_adr], bin(adr), length);
 		}
 	} 
-	//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^create^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-	while(fgets(temp, 20, search) != NULL)
+	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^create^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
+	ip *memory;
+	while(fgets(string, 20, search) != NULL)
 	{
-		sscanf(temp, "%u.%u.%u.%u", &adr[0], &adr[1], &adr[2], &adr[3]);
+		sscanf(string, "%u.%u.%u.%u", &adr[0], &adr[1], &adr[2], &adr[3]);
+		int_adr = bin_to_int23(adr);
+		/*while(tab3[int_adr] != NULL)
+		{
+			int_adr = bin_to_int23(adr, int_adr);
+			if(tab3[int_adr] >> (32 - (tab3[int_adr] -> length)) == tab3[int_adr] -> address)
+			{
+				printf("%e", tab3[int_adr] -> address);
+				tab3[int_adr] = tab3[int_adr] -> next;
+			}
+			else
+			{
+				tab3[int_adr] = tab3[int_adr] -> next;
+			}
+		}*/
+		memory = searching(tab3[int_adr], bin(adr));
+		if(memory != NULL)
+		{
+			memory = searching(tab3[int_adr], bin(adr));
+			memory_to_ip(memory ,adr);
+			length = memory -> length;
+			fprintf(result, "%u.%u.%u.%u/%u\n", adr[0], adr[1], adr[2], adr[3], length);
+			locate_tab = 3;
+		}
+
+		memory = searching(tab2[int_adr], bin(adr));
+		if(memory != NULL && locate_tab == 0)
+		{
+			memory = searching(tab2[int_adr], bin(adr));
+			memory_to_ip(memory ,adr);
+			length = memory -> length;
+			fprintf(result, "%u.%u.%u.%u/%u\n", adr[0], adr[1], adr[2], adr[3], length);
+			locate_tab = 2;
+		}
+
+		int_adr = bin_to_int1(adr);
+		memory = searching(tab1[int_adr], bin(adr));
+		if(memory != NULL && locate_tab == 0)
+		{
+			memory = searching(tab1[int_adr], bin(adr));
+			memory_to_ip(memory ,adr);
+			length = memory -> length;
+			fprintf(result, "%u.%u.%u.%u/%u\n", adr[0], adr[1], adr[2], adr[3], length);
+			locate_tab = 1;
+		}
+		if(locate_tab == 0)
+		{
+			fprintf(result, "%s", "0.0.0.0/0\n");
+		}
+		locate_tab = 0;
 	}
+	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^search^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 	fclose(k400);
 	fclose(result);
 	fclose(search);
