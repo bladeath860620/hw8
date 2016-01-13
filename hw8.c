@@ -78,7 +78,7 @@ unsigned int bin_to_int(unsigned int adr[], unsigned int length, unsigned int in
 	}
 }
 
-unsigned int bin_to_int1(unsigned int adr[])
+unsigned int bin_to_int1(unsigned int adr[])//rewrote two kinds of bin_to_int because no length is given while searching
 {
 		return bin(adr) >> (32-8);
 }
@@ -99,7 +99,6 @@ ip *searching(ip *head, unsigned int goal)
 		if(origin_adr == target)
 		{
 			return temp;
-			break;
 		}
 		else
 		{
@@ -109,20 +108,17 @@ ip *searching(ip *head, unsigned int goal)
 	return NULL;
 }
 
-void memory_to_ip(ip *memory, unsigned int adr[])
+void memory_to_ip(ip *memory, unsigned int adr[])//turn memory to binary mode
 {
-	if(memory != NULL)
-	{
-		unsigned int binary = memory -> address;
-		adr[0] = binary >> 24;
-		binary &= 0x00FFFFFF;
-		adr[1] = binary >> 16;
-		binary &= 0x0000FFFF;
-		adr[2] = binary >> 8;
-		binary &= 0x000000FF;
-		adr[3] = binary;
-		//length = memory -> length
-	}
+	unsigned int binary = memory -> address;
+	adr[0] = binary >> 24;
+	binary &= 0x00FFFFFF;
+	adr[1] = binary >> 16;
+	binary &= 0x0000FFFF;
+	adr[2] = binary >> 8;
+	binary &= 0x000000FF;
+	adr[3] = binary;
+	//length = memory -> length;
 	return;
 }
 
@@ -194,19 +190,20 @@ int main()
 		memory = searching(tab3[int_adr], bin(adr));
 		if(memory != NULL)
 		{
-			memory = searching(tab3[int_adr], bin(adr));
-			memory_to_ip(memory ,adr);
+			//memory = searching(tab3[int_adr], bin(adr));
 			length = memory -> length;
+			memory_to_ip(memory ,adr);
 			fprintf(result, "%u.%u.%u.%u/%u\n", adr[0], adr[1], adr[2], adr[3], length);
 			locate_tab = 3;
 		}
 
+		int_adr = bin_to_int23(adr);
 		memory = searching(tab2[int_adr], bin(adr));
 		if(memory != NULL && locate_tab == 0)
 		{
-			memory = searching(tab2[int_adr], bin(adr));
-			memory_to_ip(memory ,adr);
+			//memory = searching(tab2[int_adr], bin(adr));
 			length = memory -> length;
+			memory_to_ip(memory ,adr);
 			fprintf(result, "%u.%u.%u.%u/%u\n", adr[0], adr[1], adr[2], adr[3], length);
 			locate_tab = 2;
 		}
@@ -215,9 +212,9 @@ int main()
 		memory = searching(tab1[int_adr], bin(adr));
 		if(memory != NULL && locate_tab == 0)
 		{
-			memory = searching(tab1[int_adr], bin(adr));
-			memory_to_ip(memory ,adr);
+			//memory = searching(tab1[int_adr], bin(adr));
 			length = memory -> length;
+			memory_to_ip(memory ,adr);
 			fprintf(result, "%u.%u.%u.%u/%u\n", adr[0], adr[1], adr[2], adr[3], length);
 			locate_tab = 1;
 		}
