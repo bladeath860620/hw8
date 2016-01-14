@@ -33,7 +33,7 @@ unsigned int bin(unsigned int adr[])
 	return bin_adr;
 }
 
-ip *newnode(ip *head, unsigned int adr, unsigned int len)//put ip under ling lists while doing sort at the same time()
+ip *newnode(ip *head, unsigned int adr, unsigned int len)//put ip under link lists while doing sort at the same time()
 {
 	ip *temp = head;
 	ip *node = malloc(sizeof(ip));
