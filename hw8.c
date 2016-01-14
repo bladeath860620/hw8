@@ -33,7 +33,7 @@ unsigned int bin(unsigned int adr[])
 	return bin_adr;
 }
 
-ip *newnode(ip *head, unsigned int adr, unsigned int len)
+ip *newnode(ip *head, unsigned int adr, unsigned int len)//put ip under ling lists while doing sort at the same time()
 {
 	ip *temp = head;
 	ip *node = malloc(sizeof(ip));
@@ -87,7 +87,7 @@ unsigned int bin_to_int23(unsigned int adr[])
 		return bin(adr) >> (32-12);
 }
 
-unsigned int compare_length(unsigned int len_mem[])
+/*unsigned int compare_length(unsigned int len_mem[])
 {
 	unsigned int longest, compare;
 	int i;
@@ -102,9 +102,9 @@ unsigned int compare_length(unsigned int len_mem[])
 	{
 		return longest;
 	}
-}
+}*/
 
-ip *searching(ip *head, unsigned int goal, unsigned int len_mem[])
+ip *searching(ip *head, unsigned int goal/*, unsigned int len_mem[]*/)
 {
 	unsigned int origin_adr; 
 	unsigned int target;
@@ -170,8 +170,39 @@ void link_list(ip *head, FILE *test)
 		memory_to_ip(temp, test);
 		temp = temp -> next;
 	}
-
 	return;
+}
+
+ip* del(ip *head, unsigned int adr, unsigned int len)
+{
+	ip *temp = head;
+	ip *dele;
+	if(head == NULL)
+	{
+		return head;
+	}
+	if((head -> length) == len && (head -> address) == adr)
+	{
+		dele = head;
+		free(dele);
+		head = head -> next;
+		return head;
+	}
+	while(temp -> next != NULL)
+	{
+		if(((temp -> next) -> length) == len && ((temp -> next) -> address) == adr)
+		{
+			dele = temp -> next;
+			free(dele);
+			temp -> next = (temp -> next) -> next;
+			return head;
+		}
+		else
+		{
+			temp = temp -> next;
+		}
+	}
+	return head;
 }
 
 int main()
@@ -181,7 +212,7 @@ int main()
 	char string[30];
 	unsigned int adr[4], length;
 	unsigned int int_adr = 0;
-	unsigned int len_mem[20] = {0};
+	//unsigned int len_mem[20] = {0};
 	ip *tab1[(int)pow(2,8)];
 	ip *tab2[(int)pow(2,12)];
 	ip *tab3[(int)pow(2,12)];
@@ -244,7 +275,7 @@ int main()
 		sscanf(string, "%u.%u.%u.%u", &adr[0], &adr[1], &adr[2], &adr[3]);
 
 		int_adr = bin_to_int23(adr);
-		memory = searching(tab3[int_adr], bin(adr), len_mem);
+		memory = searching(tab3[int_adr], bin(adr)/*, len_mem*/);
 		if(memory != NULL)
 		{
 			memory_to_ip(memory, result);
@@ -252,7 +283,7 @@ int main()
 		}
 
 		int_adr = bin_to_int23(adr);
-		memory = searching(tab2[int_adr], bin(adr), len_mem);
+		memory = searching(tab2[int_adr], bin(adr)/*, len_mem*/);
 		if(memory != NULL && locate_tab == 0)
 		{
 			memory_to_ip(memory, result);
@@ -260,7 +291,7 @@ int main()
 		}
 
 		int_adr = bin_to_int1(adr);
-		memory = searching(tab1[int_adr], bin(adr), len_mem);
+		memory = searching(tab1[int_adr], bin(adr)/*, len_mem*/);
 		if(memory != NULL && locate_tab == 0)
 		{
 			memory_to_ip(memory, result);
@@ -293,7 +324,25 @@ int main()
 		}
 	}
 	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^insert^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
-	
+	while(fgets(string, 30, delete) != NULL)
+	{
+		sscanf(string, "%u.%u.%u.%u/%u", &adr[0], &adr[1], &adr[2], &adr[3], &length);
+		if(length >= 8 && length <= 15)
+		{
+			int_adr = bin_to_int(adr, length, int_adr);
+			tab1[int_adr] = del(tab1[int_adr], bin(adr), length);
+		}
+		if(length >= 16 && length <= 24)
+		{
+			int_adr = bin_to_int(adr, length, int_adr);
+			tab2[int_adr] = del(tab2[int_adr], bin(adr), length);
+		}
+		if(length >=25 && length <= 32)
+		{
+			int_adr = bin_to_int(adr, length, int_adr);
+			tab3[int_adr] = del(tab3[int_adr], bin(adr), length);
+		}
+	} 
 	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^delete^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 	fclose(k400);
 	fclose(result);
