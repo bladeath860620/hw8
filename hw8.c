@@ -108,7 +108,7 @@ ip *searching(ip *head, unsigned int goal)
 	return NULL;
 }
 
-void memory_to_ip(ip *memory, unsigned int adr[])//turn memory to binary mode
+void memory_to_ip(ip *memory)//turn memory to binary mode
 {
 	unsigned int binary = memory -> address;
 	adr[0] = binary >> 24;
@@ -122,6 +122,17 @@ void memory_to_ip(ip *memory, unsigned int adr[])//turn memory to binary mode
 	return;
 }
 
+void link_list(ip *head)
+{
+	ip *temp = head;
+	while(temp != NULL)
+	{
+		memory_to_ip(temp);
+		temp = temp -> next;
+	}
+	return;
+}
+
 int main()
 {
 	int i;
@@ -132,13 +143,13 @@ int main()
 	ip *tab1[(int)pow(2,8)];
 	ip *tab2[(int)pow(2,12)];
 	ip *tab3[(int)pow(2,12)];
-	FILE *k400, *result, *search, *insert, *delete;
+	FILE *k400, *result, *search, *insert, *delete, *test;
 	k400 = fopen("IPv4_400k.txt", "r");
 	result = fopen("result.txt", "w");
 	search = fopen("IPv4_search.txt", "r");
 	insert = fopen("IPv4_insert.txt", "r");
 	delete = fopen("IPv4_delete.txt", "r");
-
+	test = fopen("test.txt", "w");
 	for(i = 0; i < pow(2,8); i++)
 	{
 		tab1[i] = NULL;
@@ -169,7 +180,26 @@ int main()
 		}
 	} 
 	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^create^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
-	ip *memory;
+	for(i = 0; i < 1 << 8;i++)
+	{
+		link_list(tab1[i]);
+		fprintf(test, tab1[i]);
+		fprintf(test, "=========================\n");
+	}
+	for(i = 0;i < 1 << 12;i++)
+	{
+		link_list(tab2[i]);
+		fprintf(test, tab2[i]);
+		fprintf(test, "=========================\n");
+	}
+	for(i = 0;i < 1 << 12;i++)
+	{
+		link_list(tab3[i]);
+		fprintf(test, tab3[i]);
+		fprintf(test, "=========================\n");
+	}
+	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^test^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
+	/* *ip *memory;
 	while(fgets(string, 20, search) != NULL)
 	{
 		sscanf(string, "%u.%u.%u.%u", &adr[0], &adr[1], &adr[2], &adr[3]);
@@ -186,7 +216,7 @@ int main()
 			{
 				tab3[int_adr] = tab3[int_adr] -> next;
 			}
-		}*/
+		}//--------------------
 		memory = searching(tab3[int_adr], bin(adr));
 		if(memory != NULL)
 		{
@@ -223,7 +253,7 @@ int main()
 			fprintf(result, "%s", "0.0.0.0/0\n");
 		}
 		locate_tab = 0;
-	}
+	}*/
 	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^search^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 	fclose(k400);
 	fclose(result);
