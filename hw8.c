@@ -216,13 +216,17 @@ int main()
 	ip *tab1[(int)pow(2,8)];
 	ip *tab2[(int)pow(2,12)];
 	ip *tab3[(int)pow(2,12)];
-	FILE *k400, *result, *search, *insert, *delete, *test;
+	FILE *k400, *result, *search, *insert, *delete, *test ,*search_csv, *insert_csv, *delete_csv;
 	k400 = fopen("IPv4_400k.txt", "r");
 	result = fopen("result.txt", "w");
 	search = fopen("IPv4_search.txt", "r");
 	insert = fopen("IPv4_insert.txt", "r");
 	delete = fopen("IPv4_delete.txt", "r");
 	test = fopen("test.txt", "w");
+	search_csv = fopen("search.csv", "w");
+	insert_csv = fopen("insert.csv", "w");
+	delete_csv = fopen("delete.csv", "w");
+	unsigned long long int begin,end;
 	for(i = 0; i < pow(2,8); i++)
 	{
 		tab1[i] = NULL;
@@ -272,8 +276,8 @@ int main()
 	ip *memory;
 	while(fgets(string, 30, search) != NULL)
 	{
+		begin=rdtsc();
 		sscanf(string, "%u.%u.%u.%u", &adr[0], &adr[1], &adr[2], &adr[3]);
-
 		int_adr = bin_to_int23(adr);
 		memory = searching(tab3[int_adr], bin(adr)/*, len_mem*/);
 		if(memory != NULL)
@@ -302,10 +306,13 @@ int main()
 			fprintf(result, "%s", "0.0.0.0/0\n");
 		}
 		locate_tab = 0;
+		end=rdtsc();
+		fprintf(search_csv, "%llu\n", end-begin);
 	}	
 	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^search^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 	while(fgets(string, 30, insert) != NULL)
 	{
+		begin=rdtsc();
 		sscanf(string, "%u.%u.%u.%u/%u", &adr[0], &adr[1], &adr[2], &adr[3], &length);
 		if(length >= 8 && length <= 15)
 		{
@@ -322,10 +329,13 @@ int main()
 			int_adr = bin_to_int(adr, length, int_adr);
 			tab3[int_adr] = newnode(tab3[int_adr], bin(adr), length);
 		}
+		end=rdtsc();
+		fprintf(insert_csv, "%llu\n", end-begin);
 	}
 	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^insert^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 	while(fgets(string, 30, delete) != NULL)
 	{
+		begin=rdtsc();
 		sscanf(string, "%u.%u.%u.%u/%u", &adr[0], &adr[1], &adr[2], &adr[3], &length);
 		if(length >= 8 && length <= 15)
 		{
@@ -342,6 +352,8 @@ int main()
 			int_adr = bin_to_int(adr, length, int_adr);
 			tab3[int_adr] = del(tab3[int_adr], bin(adr), length);
 		}
+		end=rdtsc();
+		fprintf(delete_csv, "%llu\n", end-begin);
 	} 
 	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^delete^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 	fclose(k400);
@@ -350,4 +362,7 @@ int main()
 	fclose(insert);
 	fclose(delete);
 	fclose(test);
+	fclose(search_csv);
+	fclose(insert_csv);
+	fclose(delete_csv);
 }
