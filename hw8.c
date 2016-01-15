@@ -257,7 +257,7 @@ int main()
 		}
 	} 
 	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^create^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
-	for(i = 0; i < 1 << 8; i++)
+	/*for(i = 0; i < 1 << 8; i++)
 	{
 		link_list(tab1[i], test);
 		fprintf(test, "%s", "=========================\n");
@@ -356,6 +356,22 @@ int main()
 		fprintf(delete_csv, "%llu\n", end-begin);
 	} 
 	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^delete^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
+	for(i = 0; i < 1 << 8; i++)
+	{
+		link_list(tab1[i], test);
+		fprintf(test, "%s", "=========================\n");
+	}
+	for(i = 0; i < 1 << 12; i++)
+	{
+		link_list(tab2[i], test);
+		fprintf(test, "%s", "=========================\n");
+	}
+	for(i = 0; i < 1 << 12; i++)
+	{
+		link_list(tab3[i], test);
+		fprintf(test, "%s", "=========================\n");
+	}
+	/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^test^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 	fclose(k400);
 	fclose(result);
 	fclose(search);
